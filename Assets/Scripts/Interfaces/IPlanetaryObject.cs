@@ -4,6 +4,4 @@ public interface IPlanetaryObject
     float Mass { get; }
     float Radius { get; }
     void Initialize(float mass);
-    
-    void RemovePlanet();
 }

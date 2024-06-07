@@ -13,11 +13,19 @@ public class PlanetaryObject : MonoBehaviour, IPlanetaryObject
         UpdateVisualRepresentation();
     }
 
-    public void RemovePlanet()
+    public static PlanetaryObject CreatePlanetaryObject(GameObject planetPrefab, float mass, Vector3 position, Transform parent)
     {
-        Destroy(gameObject);
-    }
+        GameObject planetObject = Instantiate(planetPrefab, position, Quaternion.identity, parent);
+        PlanetaryObject planet = planetObject.GetComponent<PlanetaryObject>();
+        if (planet == null)
+        {
+            planet = planetObject.AddComponent<PlanetaryObject>();
+        }
+        planet.Initialize(mass);
 
+        return planet;
+    }
+    
     private MassClassEnum DetermineMassClass(float mass)
     {
         return mass switch
@@ -34,7 +42,7 @@ public class PlanetaryObject : MonoBehaviour, IPlanetaryObject
 
     private void UpdateVisualRepresentation()
     {
-        float radius = MassClass switch
+        var radius = MassClass switch
         {
             MassClassEnum.Asteroidan => Random.Range(0f, 0.03f),
             MassClassEnum.Mercurian => Random.Range(0.03f, 0.7f),

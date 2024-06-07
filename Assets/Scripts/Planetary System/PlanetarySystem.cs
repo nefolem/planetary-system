@@ -4,9 +4,8 @@ using System.Linq;
 
 public class PlanetarySystem : MonoBehaviour, IPlanetarySystem
 {
-    private float _planetSpeed;
     private readonly List<IPlanetaryObject> _planets = new();
-    
+    private float _planetSpeed;
 
     public IEnumerable<IPlanetaryObject> PlanetaryObjects => _planets;
     public GameObject PlanetPrefab { get; set; }
@@ -24,7 +23,7 @@ public class PlanetarySystem : MonoBehaviour, IPlanetarySystem
 
     void Update()
     {
-        UpdateOrbit(_planetSpeed);
+        UpdateOrbit();
     }
     
     private void GeneratePlanetarySystem(float totalMass)
@@ -42,38 +41,18 @@ public class PlanetarySystem : MonoBehaviour, IPlanetarySystem
 
             Vector3 randomPosition = new Vector3(Mathf.Cos(randomAngle * Mathf.Deg2Rad), 0f, Mathf.Sin(randomAngle * Mathf.Deg2Rad)) * randomOrbitRadius;
             
-            PlanetaryObject planet = CreatePlanetaryObject(planetMass, randomPosition);
+            PlanetaryObject planet = PlanetaryObject.CreatePlanetaryObject(PlanetPrefab, planetMass, randomPosition, transform);
             _planets.Add(planet);
         }
     }
 
-    private void UpdateOrbit(float planetSpeed)
+    private void UpdateOrbit()
     {
         foreach (var planet in _planets)
         {
-            (planet as PlanetaryObject).transform.RotateAround(Vector3.zero, Vector3.up, planetSpeed / planet.Radius * Time.deltaTime);
+            (planet as PlanetaryObject).transform.RotateAround(Vector3.zero, Vector3.up, _planetSpeed / planet.Radius * Time.deltaTime);
         }
     }
 
 
-    private PlanetaryObject CreatePlanetaryObject(float mass, Vector3 position)
-    {
-        GameObject planetObject = Instantiate(PlanetPrefab, position, Quaternion.identity, transform);
-        PlanetaryObject planet = planetObject.GetComponent<PlanetaryObject>();
-        if (planet == null)
-        {
-            planet = planetObject.AddComponent<PlanetaryObject>();
-        }
-        planet.Initialize(mass);
-
-        return planet;
-    }
-
-    public void ClearPlanetarySystem()
-    {
-        foreach (var planet in _planets)
-        {
-            planet.RemovePlanet();
-        }
-    }
 }
